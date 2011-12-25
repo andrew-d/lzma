@@ -138,7 +138,7 @@ func BenchmarkEncoder(b *testing.B) {
 			start <- true
 			n, err := io.Copy(w, in)
 			if err != nil {
-				log.Exitf("%v", err)
+				log.Fatalf("%v", err)
 			}
 			b.SetBytes(n)
 		}()
@@ -148,10 +148,10 @@ func BenchmarkEncoder(b *testing.B) {
 		_, err := io.Copy(buf, pr)
 		b.StopTimer()
 		if err != nil {
-			log.Exitf("%v", err)
+			log.Fatalf("%v", err)
 		}
 	}
 	if bytes.Equal(buf.Bytes(), bench.lzma) == false { // check only once, not at every iteration
-		log.Exitf("%s: got %d-byte %q, want %d-byte %q", bench.descr, len(buf.Bytes()), buf.String(), len(bench.lzma), string(bench.lzma))
+		log.Fatalf("%s: got %d-byte %q, want %d-byte %q", bench.descr, len(buf.Bytes()), buf.String(), len(bench.lzma), string(bench.lzma))
 	}
 }

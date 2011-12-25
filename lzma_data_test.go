@@ -300,7 +300,7 @@ type lzmaBenchmark struct {
 func readFile(filename string) []byte {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Exitf("%v", err)
+		log.Fatalf("%v", err)
 	}
 	return file
 }

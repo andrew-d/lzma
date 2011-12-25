@@ -88,19 +88,17 @@ const (
 	kMatchMaxLen                    = kMatchMinLen + kNumLenSymbols - 1
 )
 
-
 // A streamError reports the presence of corrupt input stream.
-var streamError os.Error = os.NewError("error in lzma encoded data stream")
+var streamError = os.NewError("error in lzma encoded data stream")
 
 // A headerError reports an error in the header of the lzma encoder file.
-var headerError os.Error = os.NewError("error in lzma header")
+var headerError = os.NewError("error in lzma header")
 
 // A nReadError reports what it's message reads
-var nReadError os.Error = os.NewError("number of bytes returned by Reader.Read() didn't meet expectances")
+var nReadError = os.NewError("number of bytes returned by Reader.Read() didn't meet expectances")
 
 // A nWriteError reports what it's message reads
-var nWriteError os.Error = os.NewError("number of bytes returned by Writer.Write() didn't meet expectances")
-
+var nWriteError = os.NewError("number of bytes returned by Writer.Write() didn't meet expectances")
 
 // TODO: implement this err
 // A dataIntegrityError reports an error encountered while cheching data integrity.
@@ -163,7 +161,6 @@ func getLenToPosState(length uint32) uint32 {
 	return kNumLenToPosStates - 1
 }
 
-
 // LZMA compressed file format
 // ---------------------------
 // Offset Size 	      Description
@@ -171,12 +168,11 @@ func getLenToPosState(length uint32) uint32 {
 //   1     4   		Dictionary size (little endian)
 //   5     8   		Uncompressed size (little endian). Size -1 stands for unknown size
 
-
 // lzma properties
 type props struct {
 	litContextBits, // lc
 	litPosStateBits, // lp
-	posStateBits     uint8 // pb
+	posStateBits uint8 // pb
 	dictSize uint32
 }
 
@@ -196,7 +192,6 @@ func (p *props) decodeProps(buf []byte) {
 		p.dictSize += uint32(buf[i+1]) << uint32(i*8)
 	}
 }
-
 
 type decoder struct {
 	// i/o
@@ -359,7 +354,6 @@ func (z *decoder) decoder(r io.Reader, w io.Writer) (err os.Error) {
 	z.doDecode()
 	return
 }
-
 
 // NewReader returns a new ReadCloser that can be used to read the uncompressed
 // version of r. It is the caller's responsibility to call Close on the ReadCloser

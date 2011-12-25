@@ -18,13 +18,11 @@ const (
 	DefaultCompression = 5
 )
 
-
 // local error wrapper so we can distinguish between os.Errors we want
 // to return as errors from genuine panics
 type osError struct {
 	os.Error
 }
-
 
 // An argumentValueError reports an error encountered while parsing user provided arguments.
 type argumentValueError struct {
@@ -35,7 +33,6 @@ type argumentValueError struct {
 func (e *argumentValueError) String() string {
 	return fmt.Sprintf("illegal argument value error: %s with value %v", e.msg, e.val)
 }
-
 
 // Report error and stop executing. Wraps os.Errors an osError for handlePanics() to
 // distinguish them from genuine panics.
@@ -56,7 +53,6 @@ func handlePanics(error *os.Error) {
 		}
 	}
 }
-
 
 type syncPipeReader struct {
 	*io.PipeReader
@@ -86,7 +82,6 @@ func syncPipe() (*syncPipeReader, *syncPipeWriter) {
 	sw := &syncPipeWriter{w, sr.closeChan}
 	return sr, sw
 }
-
 
 type compressionLevel struct {
 	dictSize        uint32 // d, 1 << dictSize
@@ -134,7 +129,6 @@ func (cl *compressionLevel) checkValues() {
 	}
 }
 
-
 var gFastPos []byte = make([]byte, 1<<11)
 
 // should be called in the encoder's contructor
@@ -171,7 +165,6 @@ func getPosSlot2(pos uint32) uint32 {
 	return uint32(gFastPos[pos>>26] + 52)
 }
 
-
 type optimal struct {
 	state,
 	posPrev2,
@@ -204,7 +197,6 @@ func (o *optimal) isShortRep() bool {
 	}
 	return false
 }
-
 
 const (
 	eMatchFinderTypeBT2  = 0
@@ -1041,7 +1033,7 @@ func (z *encoder) encoder(r io.Reader, w io.Writer, size int64, level int) (err 
 
 	// do not move before w.Write(header)
 	z.re = newRangeEncoder(w)
-	mft, err := strconv.Atoui(strings.Split(z.cl.matchFinder, "", -1)[2])
+	mft, err := strconv.Atoui(strings.Split(z.cl.matchFinder, "")[2])
 	if err != nil {
 		return
 	}

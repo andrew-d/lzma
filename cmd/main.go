@@ -40,7 +40,7 @@ func usage() {
 func exit(msg string) {
 	usage()
 	fmt.Fprintln(os.Stderr)
-	log.Exitf("%s: check args: %s\n\n", os.Args[0], msg)
+	log.Fatalf("%s: check args: %s\n\n", os.Args[0], msg)
 }
 
 func setByUser(name string) (isSet bool) {
@@ -56,7 +56,7 @@ func main() {
 	flag.Parse()
 	if *help == true {
 		usage()
-		os.Exit(0)
+		log.Fatal(0)
 	}
 	//if *stdout == true && *suffix != "lzma" {
 	if *stdout == true && setByUser("s") == true {
@@ -100,7 +100,7 @@ func main() {
 		inFilePath = flag.Args()[0]
 		f, err := os.Lstat(inFilePath)
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 		if f == nil {
 			exit(fmt.Sprintf("file %s not found", inFilePath))
@@ -118,11 +118,11 @@ func main() {
 				outFileDir, outFileName := path.Split(inFilePath)
 				if strings.HasSuffix(outFileName, "."+*suffix) {
 					if len(outFileName) > len("."+*suffix) {
-						nstr := strings.Split(outFileName, ".", len(outFileName))
+						nstr := strings.SplitN(outFileName, ".", len(outFileName))
 						estr := strings.Join(nstr[0:len(nstr)-1], ".")
 						outFilePath = outFileDir + estr
 					} else {
-						log.Exitf("error: can't strip suffix .%s from file %s", *suffix, inFilePath)
+						log.Fatalf("error: can't strip suffix .%s from file %s", *suffix, inFilePath)
 					}
 				} else {
 					exit(fmt.Sprintf("file %s doesn't have suffix .%s", inFilePath, *suffix))
@@ -134,13 +134,13 @@ func main() {
 
 			f, err = os.Lstat(outFilePath)
 			if err != nil && f != nil { // should be: ||| if err != nil && err != "file not found" ||| but i can't find the error's id
-				log.Exit(err.String())
+				log.Fatal(err.String())
 			}
 			if f != nil && f.IsRegular() {
 				if *force == true {
 					err = os.Remove(outFilePath)
 					if err != nil {
-						log.Exit(err.String())
+						log.Fatal(err.String())
 					}
 				} else {
 					exit(fmt.Sprintf("outFile %s exists. use force to overwrite", outFilePath))
@@ -164,16 +164,16 @@ func main() {
 			if stdin == true {
 				inFile = os.Stdin
 			} else {
-				inFile, err = os.Open(inFilePath, os.O_RDONLY, 0400)
+				inFile, err = os.Open(inFilePath)
 			}
 			defer inFile.Close()
 			if err != nil {
-				log.Exit(err.String())
+				log.Fatal(err.String())
 			}
 
 			_, err = io.Copy(pw, inFile)
 			if err != nil {
-				log.Exit(err.String())
+				log.Fatal(err.String())
 			}
 
 		}()
@@ -187,16 +187,16 @@ func main() {
 		if *stdout == true {
 			outFile = os.Stdout
 		} else {
-			outFile, err = os.Open(outFilePath, os.O_CREAT|os.O_RDWR, 0644)
+			outFile, err = os.Create(outFilePath)
 		}
 		defer outFile.Close()
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 
 		_, err = io.Copy(outFile, z)
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 
 	} else {
@@ -212,14 +212,14 @@ func main() {
 				z = lzma.NewWriterLevel(pw, *level)
 				defer z.Close()
 			} else {
-				inFile, err = os.Open(inFilePath, os.O_RDONLY, 0400)
+				inFile, err = os.Open(inFilePath)
 				defer inFile.Close()
 				if err != nil {
-					log.Exit(err.String())
+					log.Fatal(err.String())
 				}
 				f, err := os.Lstat(inFilePath)
 				if err != nil {
-					log.Exit(err.String())
+					log.Fatal(err.String())
 				}
 				z = lzma.NewWriterSizeLevel(pw, int64(f.Size), *level)
 				defer z.Close()
@@ -227,7 +227,7 @@ func main() {
 
 			_, err = io.Copy(z, inFile)
 			if err != nil {
-				log.Exit(err.String())
+				log.Fatal(err.String())
 			}
 		}()
 
@@ -238,23 +238,23 @@ func main() {
 		if *stdout == true {
 			outFile = os.Stdout
 		} else {
-			outFile, err = os.Open(outFilePath, os.O_CREAT|os.O_RDWR, 0644)
+			outFile, err = os.Create(outFilePath)
 		}
 		defer outFile.Close()
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 
 		_, err = io.Copy(outFile, pr)
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 	}
 
 	if *stdout == false && *keep == false {
 		err := os.Remove(inFilePath)
 		if err != nil {
-			log.Exit(err.String())
+			log.Fatal(err.String())
 		}
 	}
 

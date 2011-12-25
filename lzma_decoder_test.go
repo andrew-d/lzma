@@ -44,12 +44,12 @@ func BenchmarkDecoder(b *testing.B) {
 		n, err := io.Copy(buf, r)
 		b.StopTimer()
 		if err != nil {
-			log.Exitf("%v", err)
+			log.Fatalf("%v", err)
 		}
 		b.SetBytes(n)
 		r.Close()
 	}
 	if bytes.Equal(buf.Bytes(), bench.raw) == false { // check only after last iteration
-		log.Exitf("%s: got %d-byte %q, want %d-byte %q", bench.descr, len(buf.Bytes()), buf.String(), len(bench.raw), bench.raw)
+		log.Fatalf("%s: got %d-byte %q, want %d-byte %q", bench.descr, len(buf.Bytes()), buf.String(), len(bench.raw), bench.raw)
 	}
 }
